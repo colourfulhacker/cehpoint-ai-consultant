@@ -146,16 +146,16 @@ export default function App() {
         - AFTER speaking the warning, emit: "${TERMINATION_PHRASE_DETECT}"
       `;
 
+            console.log("🔗 Connecting to Gemini Live API...");
+            console.log("📦 Model:", MODEL_NAME_LIVE);
+
             const sessionPromise = ai.live.connect({
                 model: MODEL_NAME_LIVE,
                 config: {
-                    responseModalities: ['AUDIO'], // Use string to avoid enum issues
                     systemInstruction: { parts: [{ text: sysInstruction }] },
                     speechConfig: {
                         voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
                     },
-                    inputAudioTranscription: {},
-                    outputAudioTranscription: {},
                 },
                 callbacks: {
                     onopen: async () => {
