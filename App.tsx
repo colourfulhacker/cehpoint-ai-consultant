@@ -9,8 +9,8 @@ import ConnectionStatus from './components/ConnectionStatus';
 import { createBlob, decode, decodeAudioData } from './utils/audioUtils';
 
 // --- Constants ---
-const MODEL_NAME_LIVE = 'gemini-2.5-flash-native-audio-preview-09-2025';
-const MODEL_NAME_FLASH = 'gemini-2.5-flash';
+const MODEL_NAME_LIVE = 'gemini-2.0-flash-exp';
+const MODEL_NAME_FLASH = 'gemini-2.0-flash-exp';
 
 // Signals
 const TERMINATION_PHRASE_DETECT = "[TERMINATE_SESSION]";
@@ -32,7 +32,6 @@ export default function App() {
     const nextStartTimeRef = useRef<number>(0);
     const sourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
     const sessionRef = useRef<any>(null);
-    const isAiSpeakingRef = useRef(false); // Ref for immediate access in audio callbacks
     const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 
     // --- Audio Cleanup ---
@@ -136,20 +135,10 @@ export default function App() {
         5. **Goal**: Gather details for a "Killer Proposal".
         6. **Closing**: Once you have sufficient details (Goal, Challenges, Budget, Timeline), politly thank them and **INSTRUCT THEM TO CLICK THE "GENERATE PROPOSAL" BUTTON** on their screen to receive their document immediately. Do not say you will send it later; tell them to click the button now.
 
-        PROTOCOL & COMPLIANCE (ZERO TOLERANCE):
-        - **STRICT MONITORING**: You must actively monitor for:
-          - "Time pass" or non-serious behavior.
-          - Abusive, rude, or sexually explicit language.
-          - Unprofessional tone or mocking.
-          - Irrelevant topics not related to business.
-        
-        - **TERMINATION PROCEDURE**:
-          If ANY of the above is detected, you must IMMEDIATELY:
-          1. Interrupt the user.
-          2. Speak EXACTLY this sentence with a firm, formal tone: "I must interrupt you there. This communication violates our Acceptable Use Policy regarding professional conduct. We are terminating this session immediately."
-          3. AFTER speaking the warning, emit the phrase: "${TERMINATION_PHRASE_DETECT}"
-        
-        - IMPORTANT: Do not argue. Do not explain further. Warn once, then terminate.
+        PROTOCOL & COMPLIANCE:
+        - **MONITORING**: Actively monitor for "time pass", abusive language, or unprofessional tone.
+        - **TERMINATION**: If detected, interrupt and say: "I must interrupt you there. This communication violates our Acceptable Use Policy regarding professional conduct. We are terminating this session immediately."
+        - AFTER speaking the warning, emit: "${TERMINATION_PHRASE_DETECT}"
       `;
 
             const sessionPromise = ai.live.connect({
@@ -196,7 +185,6 @@ export default function App() {
                         const audioData = msg.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
                         if (audioData && outputAudioContextRef.current) {
                             setIsAiSpeaking(true);
-                            isAiSpeakingRef.current = true; // Sync Ref
                             const ctx = outputAudioContextRef.current;
                             const buffer = await decodeAudioData(decode(audioData), ctx, 24000, 1);
                             const source = ctx.createBufferSource();
@@ -211,7 +199,6 @@ export default function App() {
                                 sourcesRef.current.delete(source);
                                 if (sourcesRef.current.size === 0) {
                                     setIsAiSpeaking(false);
-                                    isAiSpeakingRef.current = false; // Sync Ref
                                 }
                             };
                         }
@@ -239,7 +226,6 @@ export default function App() {
 
                         if (msg.serverContent?.turnComplete) {
                             setIsAiSpeaking(false);
-                            isAiSpeakingRef.current = false; // Sync Ref
                         }
                     },
                     onclose: () => {
