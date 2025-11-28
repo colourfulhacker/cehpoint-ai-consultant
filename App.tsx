@@ -282,23 +282,87 @@ export default function App() {
 
         const prompt = `
       You are Dhanalakshmi AI, a Top-Tier Business Strategy Consultant at Cehpoint.
+      
+      CLIENT INFORMATION:
+      - Client Name: ${userDetails?.name}
+      - Company: ${userDetails?.company}
+      - Area of Interest: ${userDetails?.interest}
+      
       TRANSCRIPT:
       ${conversationText}
       
-      TASK: Generate an UN-IGNORABLE, High-Impact Business Proposal in MARKDOWN.
-      LANGUAGE: **ENGLISH** (Even if the transcript is in Hindi or another language, the output proposal MUST be in English).
+      TASK: Generate a PROFESSIONAL, HIGH-IMPACT Business Proposal in MARKDOWN.
       
-      STRUCTURE & CONTENT:
-      1. **Executive Summary**: Energetic and visionary.
-      2. **Strategic Analysis**: Client pain points & opportunities.
-      3. **The Cehpoint Solution**: Innovative technical solution.
-      4. **MAGIC COST ESTIMATION (Crucial)**:
-         - Create a Markdown Table titled "**Investment vs Value Analysis**".
-         - Columns: [Service Component, Standard Market Price, Cehpoint Partnership Price, Your Savings].
-         - **Magic**: Show "Lifetime Hosting", "Server Maintenance", and "Brand Marketing Support" with High Market Price but **$0 (Complimentary)** in Cehpoint Price.
-         - Show the Core Service at a competitive rate.
-         - Total the "Market Value" vs "Your Investment".
-      5. **Call to Action**: "Let's Start Your Growth Journey Today".
+      CRITICAL REQUIREMENTS:
+      1. **LANGUAGE**: Output MUST be in ENGLISH (even if transcript is in Hindi/other language)
+      2. **CURRENCY**: ALL pricing MUST be in INR (₹) format - NO dollars ($)
+      3. **CLIENT NAME**: Address the proposal to "${userDetails?.name}" from "${userDetails?.company}"
+      4. **FORMATTING**: Use proper markdown with clear sections, tables, and professional structure
+      
+      STRUCTURE:
+      
+      # Business Proposal for ${userDetails?.company}
+      
+      **Prepared for:** ${userDetails?.name}  
+      **Date:** ${new Date().toLocaleDateString('en-IN')}  
+      **Prepared by:** Dhanalakshmi AI, Cehpoint Solutions
+      
+      ---
+      
+      ## 1. Executive Summary
+      - Brief overview of ${userDetails?.company}'s needs
+      - Proposed solution summary
+      - Key benefits and value proposition
+      
+      ## 2. Understanding Your Requirements
+      - Pain points identified from conversation
+      - Business objectives
+      - Technical requirements
+      
+      ## 3. Proposed Solution
+      - Detailed technical approach
+      - Technology stack and methodology
+      - Implementation timeline
+      - Deliverables
+      
+      ## 4. Investment & Pricing
+      
+      Create a professional pricing table in this EXACT format:
+      
+      | Service Component | Market Price (INR) | Cehpoint Price (INR) | Your Savings |
+      |-------------------|-------------------|---------------------|--------------|
+      | Core Development | ₹X,XX,XXX | ₹X,XX,XXX | ₹XX,XXX |
+      | Lifetime Hosting & Maintenance | ₹XX,XXX/year | ₹0 (Complimentary) | ₹XX,XXX |
+      | Brand Marketing Support | ₹XX,XXX | ₹0 (Complimentary) | ₹XX,XXX |
+      | Technical Support (1 Year) | ₹XX,XXX | ₹0 (Included) | ₹XX,XXX |
+      | **TOTAL INVESTMENT** | **₹X,XX,XXX** | **₹X,XX,XXX** | **₹XX,XXX** |
+      
+      **Payment Options:**
+      - Full Payment: Additional 5% discount
+      - EMI Available: Flexible payment plans (3/6/12 months)
+      - Milestone-based: Pay as we deliver
+      
+      ## 5. Why Choose Cehpoint?
+      - Our expertise and track record
+      - Unique value propositions
+      - Client success stories
+      
+      ## 6. Next Steps
+      - Project kickoff timeline
+      - Immediate action items
+      - Contact information
+      
+      ---
+      
+      **IMPORTANT FORMATTING RULES:**
+      - Use ₹ symbol for ALL amounts (never $)
+      - Format large numbers with commas (e.g., ₹2,50,000)
+      - Make pricing table clear and easy to read
+      - Show "Complimentary" or "₹0" for free services
+      - Highlight total savings
+      - Keep language professional and persuasive
+      - Use bullet points for clarity
+      - Include specific numbers and timelines
     `;
 
         try {
@@ -334,8 +398,8 @@ export default function App() {
                     </div>
                 )}
 
-                {/* Header - Clean Text Branding */}
-                {appState !== AppState.PROPOSAL_VIEW && appState !== AppState.TERMINATED && (
+                {/* Header - Clean Text Branding - Hidden on Form State */}
+                {appState !== AppState.PROPOSAL_VIEW && appState !== AppState.TERMINATED && appState !== AppState.FORM && (
                     <header className="absolute top-8 left-8 flex items-center gap-3 animate-fade-in-down z-20">
                         <span className="font-bold text-slate-900 text-2xl tracking-tight">Cehpoint<span className="text-blue-600">.</span></span>
                     </header>

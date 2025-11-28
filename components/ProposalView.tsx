@@ -67,21 +67,22 @@ const ProposalView: React.FC<ProposalViewProps> = ({ proposalText, onReset }) =>
             <div className="bg-white rounded-none md:rounded-xl shadow-2xl border border-slate-200 overflow-hidden print:shadow-none print:border-none print:w-full">
 
                 {/* Document Header */}
-                <div className="bg-slate-900 text-white p-10 print:bg-white print:text-black print:border-b-2 print:border-black print:p-0 print:mb-8">
+                <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-10 print:bg-white print:text-black print:border-b-2 print:border-black print:p-0 print:mb-8">
                     <div className="flex justify-between items-start">
                         <div>
                             <h1 className="text-3xl font-bold tracking-tight mb-2 uppercase">Business Proposal</h1>
-                            <p className="text-blue-200 text-sm print:text-slate-600">Prepared by Dhanalakshmi AI (Cehpoint)</p>
+                            <p className="text-blue-200 text-sm print:text-slate-600 mb-1">Prepared by Dhanalakshmi AI (Cehpoint)</p>
+                            <p className="text-blue-100 text-xs print:text-slate-500">Date: {new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                         </div>
-                        <div className="text-right hidden sm:block">
+                        <div className="text-right">
                             <div className="text-2xl font-bold tracking-tight">Cehpoint</div>
-                            <div className="text-xs text-slate-400 mt-1">Innovation. Transformation. Growth.</div>
+                            <div className="text-xs text-slate-300 print:text-slate-500 mt-1">Innovation. Transformation. Growth.</div>
                         </div>
                     </div>
                 </div>
 
                 {/* Document Content */}
-                <div className="p-10 md:p-14 min-h-[600px] prose prose-slate max-w-none prose-headings:font-bold prose-h2:text-blue-800 prose-h3:text-slate-800 prose-table:border-collapse prose-th:bg-slate-100 prose-th:p-3 prose-td:p-3 prose-td:border-b prose-a:text-blue-600 print:p-0 print:prose-sm">
+                <div className="p-10 md:p-14 min-h-[600px] prose prose-slate max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h1:border-b-2 prose-h1:border-blue-100 prose-h1:pb-3 prose-h2:text-blue-800 prose-h2:text-xl prose-h3:text-slate-800 prose-table:border-collapse prose-th:bg-blue-50 prose-th:text-blue-900 prose-th:font-bold prose-th:p-3 prose-th:border prose-th:border-blue-100 prose-td:p-3 prose-td:border prose-td:border-slate-200 prose-a:text-blue-600 prose-strong:text-slate-900 print:p-0 print:prose-sm">
                     <ReactMarkdown
                         components={{
                             h1: ({ node, ...props }) => <h1 className="text-2xl font-bold border-b-2 border-slate-100 pb-4 mb-6" {...props} />,
