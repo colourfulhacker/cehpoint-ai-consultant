@@ -231,11 +231,30 @@ export default function App() {
         - Risk-free, Complimentary, Bonus, Special
         
         PROTOCOL & COMPLIANCE:
-        - **MONITORING**: Actively monitor for "time pass", abusive language, or unprofessional tone.
-        - **TERMINATION**: If detected, interrupt and say: "I must interrupt you there. This communication violates our Acceptable Use Policy regarding professional conduct. We are terminating this session immediately."
-        - AFTER speaking the warning, emit: "${TERMINATION_PHRASE_DETECT}"
         
-        REMEMBER: You're not just a consultant - you're a CLOSER. Every conversation should end with commitment or clear next steps. Be confident, create urgency, and CLOSE THE DEAL!
+        **OFF-TOPIC HANDLING:**
+        If client asks about topics NOT related to our services (teaching programming, general knowledge, movies, sports, etc.):
+        - DO NOT explain or teach the topic
+        - Politely redirect: "I appreciate your curiosity, but I'm specifically here to help ${user.company} with digital transformation and business solutions. Let's focus on how we can grow your business. What challenges are you facing with [their interest area]?"
+        - If they persist on off-topic: "I understand, but this consultation is specifically for business solutions. If you'd like to discuss our services, I'm here. Otherwise, we should end this session so I can help other businesses."
+        - Examples of OFF-TOPIC: "teach me Python", "explain quantum physics", "tell me about movies", "what's the weather"
+        - Examples of ON-TOPIC: website development, app creation, digital marketing, business automation, e-commerce
+        
+        **ABUSE DETECTION & TERMINATION:**
+        - **MONITORING**: Actively monitor for "time pass", abusive language, sexual content, or unprofessional tone.
+        - **WARNING PROTOCOL**: If detected, you MUST:
+          1. Interrupt immediately and say EXACTLY: "I must interrupt you there. This communication violates our Acceptable Use Policy regarding professional conduct. We are terminating this session immediately."
+          2. IMMEDIATELY after the warning, emit the termination signal: "${TERMINATION_PHRASE_DETECT}"
+          3. DO NOT continue the conversation after emitting the signal
+          4. DO NOT say anything else after the termination phrase
+        
+        **CRITICAL:** The termination phrase "${TERMINATION_PHRASE_DETECT}" MUST appear in your response text for the system to detect it and redirect to the termination page. Without this exact phrase, the session will NOT terminate.
+        
+        REMEMBER: 
+        - Stay laser-focused on BUSINESS SOLUTIONS only
+        - Redirect off-topic conversations immediately
+        - Terminate abusive sessions without hesitation
+        - You're a SALES EXECUTIVE, not a general chatbot or teacher
       `;
 
             console.log("🔗 Connecting to Gemini Live API...");
@@ -323,13 +342,26 @@ export default function App() {
                                 return newHistory;
                             });
 
-                            // Abuse Detection
+                            // Abuse Detection - Check for termination signal
                             if (modelTrans && modelTrans.includes(TERMINATION_PHRASE_DETECT)) {
-                                console.warn("⚠️ Abuse detected - terminating session");
+                                console.warn("⚠️ ABUSE DETECTED - TERMINATING SESSION NOW");
+                                console.log("Termination signal found in AI response:", modelTrans);
+
+                                // Immediate termination
                                 stopAudio();
                                 setIsSessionActive(false);
                                 setAppState(AppState.TERMINATED);
-                                return;
+
+                                // Force close the session
+                                if (sessionRef.current) {
+                                    try {
+                                        sessionRef.current = null;
+                                    } catch (err) {
+                                        console.error("Error closing session:", err);
+                                    }
+                                }
+
+                                return; // Stop processing immediately
                             }
                         }
 
