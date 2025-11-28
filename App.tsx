@@ -175,9 +175,6 @@ export default function App() {
                         processorRef.current = inputAudioContextRef.current.createScriptProcessor(4096, 1, 1);
 
                         processorRef.current.onaudioprocess = (e) => {
-                            // Prevent Double-Talk: Ignore input if AI is speaking
-                            if (isAiSpeakingRef.current) return;
-
                             const inputData = e.inputBuffer.getChannelData(0);
                             const blob = createBlob(inputData);
 
