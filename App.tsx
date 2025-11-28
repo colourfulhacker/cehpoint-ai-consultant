@@ -170,7 +170,10 @@ export default function App() {
                             // Safe send
                             sessionPromise.then(session => {
                                 try {
-                                    session.sendRealtimeInput({ media: blob });
+                                    // Only send if session is active
+                                    if (session) {
+                                        session.sendRealtimeInput({ media: blob });
+                                    }
                                 } catch (err) {
                                     console.warn("Stream send error", err);
                                 }
@@ -215,12 +218,13 @@ export default function App() {
                                 return newHistory;
                             });
 
-                            // Abuse Detection
+                            // Abuse Detection - LOG ONLY FOR NOW TO PREVENT FALSE DISCONNECTS
                             if (modelTrans && modelTrans.includes(TERMINATION_PHRASE_DETECT)) {
-                                stopAudio();
-                                setIsSessionActive(false);
-                                setAppState(AppState.TERMINATED);
-                                return;
+                                console.warn("Abuse detected (Logging only):", modelTrans);
+                                // stopAudio();
+                                // setIsSessionActive(false);
+                                // setAppState(AppState.TERMINATED);
+                                // return;
                             }
                         }
 
