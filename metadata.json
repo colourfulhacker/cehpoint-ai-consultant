@@ -1,0 +1,7 @@
+{
+  "name": "Cehpoint AI Consultant",
+  "description": "Real-time voice-based AI business consultation system generating professional proposals.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
