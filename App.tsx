@@ -218,13 +218,12 @@ export default function App() {
                                 return newHistory;
                             });
 
-                            // Abuse Detection - LOG ONLY FOR NOW TO PREVENT FALSE DISCONNECTS
+                            // Abuse Detection
                             if (modelTrans && modelTrans.includes(TERMINATION_PHRASE_DETECT)) {
-                                console.warn("Abuse detected (Logging only):", modelTrans);
-                                // stopAudio();
-                                // setIsSessionActive(false);
-                                // setAppState(AppState.TERMINATED);
-                                // return;
+                                stopAudio();
+                                setIsSessionActive(false);
+                                setAppState(AppState.TERMINATED);
+                                return;
                             }
                         }
 
