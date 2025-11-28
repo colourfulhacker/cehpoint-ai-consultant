@@ -33,6 +33,7 @@ export default function App() {
     const nextStartTimeRef = useRef<number>(0);
     const sourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
     const sessionRef = useRef<any>(null);
+    const currentAiResponseRef = useRef<string>("");
     const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 
     // --- Audio Cleanup ---
@@ -389,8 +390,16 @@ export default function App() {
                         const userTrans = msg.serverContent?.inputTranscription?.text;
 
                         if (modelTrans || userTrans) {
-                            if (userTrans) console.log("👤 User:", userTrans);
-                            if (modelTrans) console.log("🤖 AI:", modelTrans);
+                            if (userTrans) {
+                                console.log("👤 User:", userTrans);
+                                // Reset AI response accumulator when user speaks (new turn)
+                                currentAiResponseRef.current = "";
+                            }
+                            if (modelTrans) {
+                                console.log("🤖 AI:", modelTrans);
+                                // Accumulate AI response text for this turn
+                                currentAiResponseRef.current += modelTrans;
+                            }
 
                             setTranscript(prev => {
                                 const newHistory = [...prev];
@@ -399,10 +408,17 @@ export default function App() {
                                 return newHistory;
                             });
 
-                            // Abuse Detection - Check for termination signal
-                            if (modelTrans && modelTrans.includes(TERMINATION_PHRASE_DETECT)) {
+                            // Abuse Detection - Check for termination signal in ACCUMULATED text
+                            // This handles cases where the signal is split across multiple chunks
+                            const accumulatedText = currentAiResponseRef.current;
+                            const signalDetected =
+                                accumulatedText.includes(TERMINATION_PHRASE_DETECT) ||
+                                accumulatedText.includes("TERMINATE_SESSION") ||
+                                accumulatedText.includes("TERMINATE SESSION");
+
+                            if (signalDetected) {
                                 console.warn("⚠️ ABUSE DETECTED - TERMINATING SESSION NOW");
-                                console.log("Termination signal found in AI response:", modelTrans);
+                                console.log("Termination signal found in AI response:", accumulatedText);
 
                                 // Force close the session properly
                                 if (sessionRef.current) {
@@ -434,6 +450,8 @@ export default function App() {
 
                         if (msg.serverContent?.turnComplete) {
                             setIsAiSpeaking(false);
+                            // Reset accumulator on turn complete
+                            currentAiResponseRef.current = "";
                         }
                     },
                     onclose: () => {
