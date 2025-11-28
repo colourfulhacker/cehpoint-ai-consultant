@@ -404,19 +404,29 @@ export default function App() {
                                 console.warn("⚠️ ABUSE DETECTED - TERMINATING SESSION NOW");
                                 console.log("Termination signal found in AI response:", modelTrans);
 
-                                // Immediate termination
-                                stopAudio();
-                                setIsSessionActive(false);
-                                setAppState(AppState.TERMINATED);
-
-                                // Force close the session
+                                // Force close the session properly
                                 if (sessionRef.current) {
                                     try {
-                                        sessionRef.current = null;
+                                        // Await the session promise if it's still a promise
+                                        const session = await Promise.resolve(sessionRef.current);
+                                        if (session && typeof session.disconnect === 'function') {
+                                            console.log("Disconnecting Gemini Live session...");
+                                            await session.disconnect();
+                                        }
                                     } catch (err) {
                                         console.error("Error closing session:", err);
+                                    } finally {
+                                        sessionRef.current = null;
                                     }
                                 }
+
+                                // Wait a moment for the warning audio to finish playing
+                                setTimeout(() => {
+                                    // Stop all audio and set terminated state
+                                    stopAudio();
+                                    setIsSessionActive(false);
+                                    setAppState(AppState.TERMINATED);
+                                }, 500); // 500ms delay to let warning message play
 
                                 return; // Stop processing immediately
                             }
