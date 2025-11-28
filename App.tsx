@@ -32,6 +32,7 @@ export default function App() {
     const nextStartTimeRef = useRef<number>(0);
     const sourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
     const sessionRef = useRef<any>(null);
+    const isAiSpeakingRef = useRef(false); // Ref for immediate access in audio callbacks
     const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 
     // --- Audio Cleanup ---
@@ -129,8 +130,11 @@ export default function App() {
 
         STRATEGY:
         1. **Value-First**: Briefly explain *why* you need info before asking.
-        2. **Goal**: Gather details for a "Killer Proposal".
-        3. **Closing**: Once you have sufficient details (Goal, Challenges, Budget, Timeline), politly thank them and **INSTRUCT THEM TO CLICK THE "GENERATE PROPOSAL" BUTTON** on their screen to receive their document immediately. Do not say you will send it later; tell them to click the button now.
+        2. **Explain Use Case**: Based on their company (${user.company}) and interest (${user.interest}), explicitly explain HOW Cehpoint's service helps them.
+        3. **Payment Options**: Mention that **EMI options are available** for flexible payment.
+        4. **Complimentary Services**: Only mention if highly relevant to their needs.
+        5. **Goal**: Gather details for a "Killer Proposal".
+        6. **Closing**: Once you have sufficient details (Goal, Challenges, Budget, Timeline), politly thank them and **INSTRUCT THEM TO CLICK THE "GENERATE PROPOSAL" BUTTON** on their screen to receive their document immediately. Do not say you will send it later; tell them to click the button now.
 
         PROTOCOL & COMPLIANCE (ZERO TOLERANCE):
         - **STRICT MONITORING**: You must actively monitor for:
@@ -171,6 +175,9 @@ export default function App() {
                         processorRef.current = inputAudioContextRef.current.createScriptProcessor(4096, 1, 1);
 
                         processorRef.current.onaudioprocess = (e) => {
+                            // Prevent Double-Talk: Ignore input if AI is speaking
+                            if (isAiSpeakingRef.current) return;
+
                             const inputData = e.inputBuffer.getChannelData(0);
                             const blob = createBlob(inputData);
 
@@ -192,6 +199,7 @@ export default function App() {
                         const audioData = msg.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
                         if (audioData && outputAudioContextRef.current) {
                             setIsAiSpeaking(true);
+                            isAiSpeakingRef.current = true; // Sync Ref
                             const ctx = outputAudioContextRef.current;
                             const buffer = await decodeAudioData(decode(audioData), ctx, 24000, 1);
                             const source = ctx.createBufferSource();
@@ -204,7 +212,10 @@ export default function App() {
                             sourcesRef.current.add(source);
                             source.onended = () => {
                                 sourcesRef.current.delete(source);
-                                if (sourcesRef.current.size === 0) setIsAiSpeaking(false);
+                                if (sourcesRef.current.size === 0) {
+                                    setIsAiSpeaking(false);
+                                    isAiSpeakingRef.current = false; // Sync Ref
+                                }
                             };
                         }
 
@@ -231,6 +242,7 @@ export default function App() {
 
                         if (msg.serverContent?.turnComplete) {
                             setIsAiSpeaking(false);
+                            isAiSpeakingRef.current = false; // Sync Ref
                         }
                     },
                     onclose: () => {
