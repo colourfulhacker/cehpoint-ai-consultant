@@ -78,9 +78,14 @@ export default function App() {
     // --- Live Session ---
     const startLiveSession = async (user: UserDetails) => {
         if (!API_KEY) {
+            console.error("❌ API Key missing!");
             alert("API Key missing. Please check configuration.");
             return;
         }
+
+        console.log("🚀 Starting live session...");
+        console.log("📋 User details:", user);
+        console.log("🔑 API Key present:", API_KEY.substring(0, 10) + "...");
 
         try {
             setAppState(AppState.CONSULTATION);
@@ -153,9 +158,14 @@ export default function App() {
                     outputAudioTranscription: {},
                 },
                 callbacks: {
-                    onopen: () => {
+                    onopen: async () => {
+                        console.log("🟢 Session opened successfully");
                         setConnectionStatus('Connected. Listening...');
                         setIsSessionActive(true);
+
+                        // Store resolved session to avoid race condition
+                        const resolvedSession = await sessionPromise;
+                        sessionRef.current = resolvedSession;
 
                         if (!inputAudioContextRef.current) return;
 
@@ -167,26 +177,26 @@ export default function App() {
                             const inputData = e.inputBuffer.getChannelData(0);
                             const blob = createBlob(inputData);
 
-                            // Safe send
-                            sessionPromise.then(session => {
+                            // Direct send using stored session ref (no promise chain)
+                            if (sessionRef.current) {
                                 try {
-                                    // Only send if session is active
-                                    if (session) {
-                                        session.sendRealtimeInput({ media: blob });
-                                    }
+                                    sessionRef.current.sendRealtimeInput({ media: blob });
                                 } catch (err) {
                                     console.warn("Stream send error", err);
                                 }
-                            });
+                            }
                         };
 
                         source.connect(processorRef.current);
                         processorRef.current.connect(inputAudioContextRef.current.destination);
                     },
                     onmessage: async (msg: LiveServerMessage) => {
+                        console.log("📨 Message received:", msg);
+
                         // Audio Output
                         const audioData = msg.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
                         if (audioData && outputAudioContextRef.current) {
+                            console.log("🔊 Playing AI audio response");
                             setIsAiSpeaking(true);
                             const ctx = outputAudioContextRef.current;
                             const buffer = await decodeAudioData(decode(audioData), ctx, 24000, 1);
@@ -211,6 +221,9 @@ export default function App() {
                         const userTrans = msg.serverContent?.inputTranscription?.text;
 
                         if (modelTrans || userTrans) {
+                            if (userTrans) console.log("👤 User:", userTrans);
+                            if (modelTrans) console.log("🤖 AI:", modelTrans);
+
                             setTranscript(prev => {
                                 const newHistory = [...prev];
                                 if (userTrans) newHistory.push({ role: 'user', text: userTrans, timestamp: new Date() });
@@ -220,6 +233,7 @@ export default function App() {
 
                             // Abuse Detection
                             if (modelTrans && modelTrans.includes(TERMINATION_PHRASE_DETECT)) {
+                                console.warn("⚠️ Abuse detected - terminating session");
                                 stopAudio();
                                 setIsSessionActive(false);
                                 setAppState(AppState.TERMINATED);
@@ -232,12 +246,14 @@ export default function App() {
                         }
                     },
                     onclose: () => {
+                        console.log("🔴 Session closed");
                         setConnectionStatus('Disconnected');
                         setIsSessionActive(false);
                         stopAudio();
                     },
                     onerror: (err) => {
-                        console.error("Session Error", err);
+                        console.error("❌ Session Error:", err);
+                        console.error("Error details:", JSON.stringify(err, null, 2));
                         setConnectionStatus('Connection Error - Please Refresh');
                         setIsSessionActive(false);
                         stopAudio();
