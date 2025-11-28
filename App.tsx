@@ -22,6 +22,7 @@ export default function App() {
     const [connectionStatus, setConnectionStatus] = useState<string>('');
     const [isAiSpeaking, setIsAiSpeaking] = useState(false);
     const [transcript, setTranscript] = useState<Message[]>([]);
+    const [showStartInstruction, setShowStartInstruction] = useState<boolean>(false);
     const [generatedProposal, setGeneratedProposal] = useState<string>('');
 
     // Refs
@@ -91,6 +92,12 @@ export default function App() {
             setAppState(AppState.CONSULTATION);
             setConnectionStatus('Initializing Audio...');
             setTranscript([]);
+
+            // Show instruction tooltip
+            setShowStartInstruction(true);
+            setTimeout(() => {
+                setShowStartInstruction(false);
+            }, 4000);
 
             const ai = new GoogleGenAI({ apiKey: API_KEY });
             const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
@@ -700,6 +707,19 @@ export default function App() {
                 {/* CONSULTATION STATE */}
                 {appState === AppState.CONSULTATION && (
                     <div className="z-10 flex flex-col items-center gap-8 w-full max-w-3xl text-center animate-fade-in-up">
+
+                        {/* Start Speaking Instruction - Auto-dismiss after 4 seconds */}
+                        {showStartInstruction && (
+                            <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in-down">
+                                <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-xl shadow-2xl flex items-center gap-3 border border-blue-400">
+                                    <svg className="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                    </svg>
+                                    <span className="font-bold text-lg">👋 Start speaking! Say "Hello" or "Hi" to begin</span>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="relative mt-8">
                             <div className={`w-32 h-32 rounded-full flex items-center justify-center bg-white shadow-2xl transition-all duration-500 border-4 ${isAiSpeaking ? 'border-blue-500 scale-105' : 'border-slate-200'}`}>
                                 {/* Corporate Avatar */}
