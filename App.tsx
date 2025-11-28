@@ -415,7 +415,7 @@ export default function App() {
                                     <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight uppercase">Communication Terminated</h1>
                                     <p className="text-red-600 font-bold mt-2 flex items-center gap-2">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                        VIOLATION OF ACCEPTABLE USE POLICY
+                                        PROFESSIONALISM MISMATCH DETECTED
                                     </p>
                                 </div>
                                 <div className="text-right">
@@ -426,17 +426,29 @@ export default function App() {
 
                             {/* Body */}
                             <div className="p-10 space-y-6">
-                                <p className="text-slate-700 leading-relaxed text-lg">
-                                    This automated session has been discontinued due to a detected violation of our professional conduct standards. Cehpoint Solutions maintains a zero-tolerance policy regarding:
+                                <p className="text-slate-900 leading-relaxed text-lg font-semibold">
+                                    We cannot proceed with further communication.
                                 </p>
-                                <ul className="list-disc list-inside space-y-2 text-slate-600 bg-red-50 p-6 rounded-lg border border-red-100">
-                                    <li>Unprofessional or abusive language</li>
-                                    <li>Harassment or inappropriate behavior</li>
-                                    <li>Misuse of automated consultation resources</li>
-                                    <li>Non-business related discourse</li>
-                                </ul>
-                                <p className="text-sm text-slate-500 italic border-l-4 border-slate-300 pl-4 py-1">
-                                    "Our automated systems and AI consultants are programmed to maintain a strict standard of professional discourse. This event has been logged."
+                                <p className="text-slate-700 leading-relaxed text-base">
+                                    Your conduct does not align with our professional standards and corporate culture. For this reason, <strong>we are out</strong>.
+                                </p>
+
+                                <div className="bg-red-50 p-6 rounded-lg border-l-4 border-red-600">
+                                    <p className="text-slate-800 font-semibold mb-3">To avoid legal consequences from our side:</p>
+                                    <p className="text-slate-700 text-sm leading-relaxed">
+                                        This session has been terminated due to unprofessional behavior. We maintain strict standards of business conduct and will not tolerate abuse, time-wasting, or inappropriate communication.
+                                    </p>
+                                </div>
+
+                                <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                                    <p className="text-blue-900 font-bold text-sm uppercase tracking-wide mb-2">⚠️ Professional Conduct Required</p>
+                                    <p className="text-slate-700 text-sm">
+                                        Further, learn some professionalism before engaging with automated business consultation systems. Our AI consultants are designed for serious business inquiries only.
+                                    </p>
+                                </div>
+
+                                <p className="text-xs text-slate-500 italic border-l-4 border-slate-300 pl-4 py-2">
+                                    "This event has been logged and may be reviewed for compliance purposes. Cehpoint Solutions reserves the right to refuse service to individuals who violate our Acceptable Use Policy."
                                 </p>
                             </div>
 
