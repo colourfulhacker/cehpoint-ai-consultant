@@ -132,9 +132,20 @@ export default function App() {
         2. **Goal**: Gather details for a "Killer Proposal".
         3. **Closing**: Once you have sufficient details (Goal, Challenges, Budget, Timeline), politly thank them and **INSTRUCT THEM TO CLICK THE "GENERATE PROPOSAL" BUTTON** on their screen to receive their document immediately. Do not say you will send it later; tell them to click the button now.
 
-        PROTOCOL:
-        - If they misbehave, say "${TERMINATION_PHRASE_DETECT}".
-        - IMPORTANT: Your final goal is to get them to click the button.
+        PROTOCOL & COMPLIANCE (ZERO TOLERANCE):
+        - **STRICT MONITORING**: You must actively monitor for:
+          - "Time pass" or non-serious behavior.
+          - Abusive, rude, or sexually explicit language.
+          - Unprofessional tone or mocking.
+          - Irrelevant topics not related to business.
+        
+        - **TERMINATION PROCEDURE**:
+          If ANY of the above is detected, you must IMMEDIATELY:
+          1. Interrupt the user.
+          2. Speak EXACTLY this sentence with a firm, formal tone: "I must interrupt you there. This communication violates our Acceptable Use Policy regarding professional conduct. We are terminating this session immediately."
+          3. AFTER speaking the warning, emit the phrase: "${TERMINATION_PHRASE_DETECT}"
+        
+        - IMPORTANT: Do not argue. Do not explain further. Warn once, then terminate.
       `;
 
             const sessionPromise = ai.live.connect({
@@ -316,22 +327,52 @@ export default function App() {
                     </header>
                 )}
 
-                {/* TERMINATED STATE */}
+                {/* TERMINATED STATE - CORPORATE COMPLIANCE NOTICE */}
                 {appState === AppState.TERMINATED && (
-                    <div className="max-w-xl w-full bg-white p-10 rounded-2xl shadow-2xl border-l-4 border-red-500 animate-fade-in-up text-center">
-                        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <div className="fixed inset-0 z-50 bg-slate-900 flex items-center justify-center p-4 animate-fade-in-up">
+                        <div className="max-w-2xl w-full bg-white rounded-none shadow-2xl overflow-hidden border-t-8 border-red-600">
+                            {/* Header */}
+                            <div className="bg-slate-50 p-8 border-b border-slate-200 flex items-start justify-between">
+                                <div>
+                                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight uppercase">Communication Terminated</h1>
+                                    <p className="text-red-600 font-bold mt-2 flex items-center gap-2">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                        VIOLATION OF ACCEPTABLE USE POLICY
+                                    </p>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Case Reference</div>
+                                    <div className="text-lg font-mono font-bold text-slate-700">CMP-{Math.floor(Math.random() * 1000000)}</div>
+                                </div>
+                            </div>
+
+                            {/* Body */}
+                            <div className="p-10 space-y-6">
+                                <p className="text-slate-700 leading-relaxed text-lg">
+                                    This automated session has been discontinued due to a detected violation of our professional conduct standards. Cehpoint Solutions maintains a zero-tolerance policy regarding:
+                                </p>
+                                <ul className="list-disc list-inside space-y-2 text-slate-600 bg-red-50 p-6 rounded-lg border border-red-100">
+                                    <li>Unprofessional or abusive language</li>
+                                    <li>Harassment or inappropriate behavior</li>
+                                    <li>Misuse of automated consultation resources</li>
+                                    <li>Non-business related discourse</li>
+                                </ul>
+                                <p className="text-sm text-slate-500 italic border-l-4 border-slate-300 pl-4 py-1">
+                                    "Our automated systems and AI consultants are programmed to maintain a strict standard of professional discourse. This event has been logged."
+                                </p>
+                            </div>
+
+                            {/* Footer */}
+                            <div className="bg-slate-900 p-6 flex justify-between items-center">
+                                <span className="text-slate-400 text-xs">Cehpoint Legal & Compliance Division</span>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="px-6 py-2 bg-white text-slate-900 font-bold text-sm uppercase tracking-wider hover:bg-slate-200 transition-colors"
+                                >
+                                    Acknowledge & Return
+                                </button>
+                            </div>
                         </div>
-                        <h2 className="text-2xl font-bold text-slate-900 mb-2">Session Terminated</h2>
-                        <p className="text-slate-600 mb-6">
-                            This consultation has been ended due to a violation of our professional communication standards.
-                        </p>
-                        <button
-                            onClick={() => { setAppState(AppState.FORM); setTranscript([]); }}
-                            className="px-6 py-3 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors"
-                        >
-                            Return to Home
-                        </button>
                     </div>
                 )}
 
